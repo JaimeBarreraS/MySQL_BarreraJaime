@@ -1001,3 +1001,47 @@ SELECT DISTINCT forma_pago FROM pago;
 SELECT * FROM producto WHERE gama = 'Ornamentales' AND cantidad_en_stock > 100 ORDER BY precio_venta DESC;
 -- 16. Devuelve un listado con todos los clientes que sean de la ciudad de Madrid y cuyo representante de ventas tenga el código de empleado 11 o 30.
 SELECT * FROM cliente WHERE ciudad = 'Madrid' AND codigo_empleado_rep_ventas IN (11, 30);
+
+-- CONSULTAS OPCIONALES  (Resuelva todas las consultas mediante INNER JOIN y NATURAL JOIN.)
+
+-- 17. Obtén un listado con el nombre de cada cliente y el nombre y apellido de su representante de ventas.
+SELECT cliente.nombre_cliente AS nombre_cliente, empleado.nombre AS nombre, empleado.apellido1 AS apellido1
+FROM cliente INNER JOIN empleado ON cliente.codigo_empleado_rep_ventas = empleado.codigo_empleado;
+-- 18. Muestra el nombre de los clientes que hayan realizado pagos junto con el nombre de sus representantes de ventas.
+SELECT cliente.nombre_cliente AS nombre_cliente, empleado.nombre AS nombre FROM cliente INNER JOIN pago ON cliente.codigo_cliente = pago.codigo_cliente 
+INNER JOIN empleado ON cliente.codigo_empleado_rep_ventas = empleado.codigo_empleado;
+-- 19. Devuelve el nombre de los clientes que han hecho pagos y el nombre de sus representantes junto con la ciudad de la oficina a la que pertenece el representante.
+SELECT cliente.nombre_cliente AS nombre_cliente, empleado.nombre AS nombre, oficina.ciudad FROM cliente 
+INNER JOIN pago ON cliente.codigo_cliente = pago.codigo_cliente INNER JOIN empleado ON cliente.codigo_empleado_rep_ventas = empleado.codigo_empleado 
+INNER JOIN oficina ON empleado.codigo_oficina = oficina.codigo_oficina;
+-- 20. Devuelve el nombre de los clientes que no hayan hecho pagos y el nombre de sus representantes junto con la ciudad de la oficina a la que pertenece el representante.
+SELECT cliente.nombre_cliente AS nombre_cliente, empleado.nombre AS nombre, oficina.ciudad FROM cliente 
+LEFT JOIN pago ON cliente.codigo_cliente = pago.codigo_cliente INNER JOIN empleado ON cliente.codigo_empleado_rep_ventas = empleado.codigo_empleado 
+INNER JOIN oficina ON empleado.codigo_oficina = oficina.codigo_oficina WHERE pago.codigo_cliente IS NULL;
+-- 21. Lista la dirección de las oficinas que tengan clientes en Fuenlabrada.
+SELECT DISTINCT oficina.ciudad FROM oficina INNER JOIN empleado ON oficina.codigo_oficina = empleado.codigo_oficina 
+INNER JOIN cliente ON empleado.codigo_empleado = cliente.codigo_empleado_rep_ventas
+WHERE cliente.ciudad = 'Fuenlabrada';
+-- 22. Devuelve el nombre de los clientes y el nombre de sus representantes junto con la ciudad de la oficina a la que pertenece el representante.
+SELECT cliente.nombre_cliente AS nombre_cliente, empleado.nombre AS nombre, oficina.ciudad 
+FROM cliente INNER JOIN empleado ON cliente.codigo_empleado_rep_ventas = empleado.codigo_empleado 
+INNER JOIN oficina ON empleado.codigo_oficina = oficina.codigo_oficina;
+-- 23. Devuelve un listado con el nombre de los empleados junto con el nombre de sus jefes.
+SELECT e1.nombre AS nombre_empleado, e2.nombre AS nombre_jefe FROM empleado e1 
+LEFT JOIN empleado e2 ON e1.codigo_jefe = e2.codigo_empleado;
+-- 24. Devuelve un listado que muestre el nombre de cada empleados, el nombre de su jefe y el nombre del jefe de sus jefe.
+SELECT e1.nombre AS nombre_empleado, e2.nombre AS nombre_jefe, e3.nombre AS nombre_jefe_de_jefe 
+FROM empleado e1 LEFT JOIN empleado e2 ON e1.codigo_jefe = e2.codigo_empleado LEFT JOIN empleado e3 ON e2.codigo_jefe = e3.codigo_empleado;
+-- 25. Devuelve el nombre de los clientes a los que no se les ha entregado a tiempo un pedido.
+SELECT cliente.nombre_cliente
+FROM cliente INNER JOIN pedido ON cliente.codigo_cliente = pedido.codigo_cliente 
+WHERE pedido.fecha_entrega > pedido.fecha_esperada;
+-- 26. Devuelve un listado de las diferentes gamas de producto que ha comprado cada cliente.
+SELECT DISTINCT cliente.nombre_cliente AS nombre_cliente, producto.gama 
+FROM cliente INNER JOIN pedido ON cliente.codigo_cliente = pedido.codigo_cliente 
+INNER JOIN detalle_pedido ON pedido.codigo_pedido = detalle_pedido.codigo_pedido 
+INNER JOIN producto ON detalle_pedido.codigo_producto = producto.codigo_producto;
+
+
+
+
